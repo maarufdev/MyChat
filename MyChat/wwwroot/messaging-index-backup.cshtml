@@ -1,0 +1,716 @@
+<div class="messaging-page-container">
+    <div id="left-container">
+        <header class="left-container-header border">
+            <input id="search-contact-convo" type="text" placeholder="Search Contact...">
+            <i class="fa-thin fa-address-book"></i>
+        </header>
+        <div id="contact-list-container"></div>
+    </div>
+    <div class="border hide-element" id="right-container">
+        <div class="messaging-container">
+            <header class="m-0 p-2 shadow border border-danger" id="message-header">
+                <div class="contact-avatar message-header-avatar">
+                    <img src="/images/avatar-2.jpg" alt="Avatar">
+                </div>
+                <div class="recipient-container">
+                    <h5 class="" id="recepient-name"></h5>
+                </div>
+                <button 
+                    type="button" 
+                    class="btn mb-1 hover-overlay bg" 
+                    aria-label="Close" 
+                    id="close-message" 
+                    style="font-size: 20px; font-weight: bold;">X</button>
+          
+            </header>
+            <div class="messages-convo-section" id="message-thread-container">
+            </div>
+            <div class="message-controller-container border shadow rounded p-3">
+                <textarea class="border rounded" id="message-input" placeholder="Type Message..."></textarea>
+                <button class="btn btn-primary border rounded" id="send-message">
+                    Send
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal modal-dialog-scrollable" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Add Contacts</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="search-contact-modal-container">
+                <input id="search-contact-modal" type="text" placeholder="Search contact to add">
+            </div>
+            <div class="modal-body border" id="contact-modal-body" style="height: 60vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+
+<script>
+    class ContactModalTemplate {
+
+        constructor() {
+            this.apiService = new ApiService();
+            this.contactModalBody = document.getElementById("contact-modal-body");
+            this.contactLists = [];
+        }
+
+        async runContactModal() {
+
+            this.removeExistingMessages();
+            await this.apiService.getUsers().then((users) => {
+                if(users){ 
+
+                    users.map((user) => {
+
+                        this.contactLists.push(user);
+                        
+                        const contactContainerClassList = ["m-3", "p-2", "border", "d-flex", "justify-content-between", "align-items-center", "flex-wrap"]
+                        const creatededContactContainer = this.createElement("div", contactContainerClassList);
+
+                        const contactUsernameClassList = ["contact-username"];
+                        const createdContactUsernameElement = this.createElement("h6", contactUsernameClassList);
+                        createdContactUsernameElement.textContent = user.contactUsername;
+
+                        const contactButtonClassList = ["btn", "btn-primary"];
+                        const createdAddContactButton = this.createElement("button", contactButtonClassList);
+                        createdAddContactButton.textContent = "Connect";
+
+                        if (user.onContactList) {
+                            createdAddContactButton.textContent = "Connected";
+                            createdAddContactButton.classList = "btn";
+                            createdAddContactButton.style.backgroundColor = "#DCE1ED";
+                            
+                            @* createdAddContactButton.stye.color = "black"; *@
+                        }
+
+                        let isRemoveState = false;
+
+                        createdAddContactButton.addEventListener('click', async () => {
+
+                            const addContactPayload = {
+                                Id: null,
+                                CurrentUserId: user.currentUserId,
+                                CurrentUsername: user.currentUsername,
+                                ContactId: user.contactId,
+                                ContactUsername: user.contactUsername,
+                                OnContactList: user.onContactList
+                            };
+                            
+                            if(!user.onContactList) {
+                                this.apiService.addContact(addContactPayload).then(({onContactList}) => {
+                                    if(onContactList){
+                                        createdAddContactButton.textContent = "Connected";
+                                        createdAddContactButton.classList = "btn";
+                                        createdAddContactButton.style.backgroundColor = "#DCE1ED";
+                                    }
+                                });
+                            }
+
+                        });
+
+                        creatededContactContainer.appendChild(createdContactUsernameElement);
+                        creatededContactContainer.appendChild(createdAddContactButton);
+                        this.contactModalBody.appendChild(creatededContactContainer);
+
+                    });
+                }
+            });
+
+            const sampleKeyword = `user`;
+            const results = this.searchUsers(sampleKeyword);
+            console.log(results)
+
+            @* const filteredResult = this.contactLists.filter((contact) => {
+                
+                let contactResult = contact.contactUsername.toLowerCase();
+                return contactResult.includes(sampleKeyword.toLocaleLowerCase());
+            })
+
+            console.log(filteredResult) *@
+        }
+
+        searchUsers(keyword){
+            const filteredResults = this.contactLists.filter((users) => {
+                const results = users.contactUsername.toLowerCase();
+                return results.includes(keyword.toLowerCase());
+            })
+
+            return filteredResults;
+        }
+
+        createElement(htmlTag, classList) {
+            let newHtmlTag = document.createElement(htmlTag);
+            if (classList) {
+                for (const item of classList) {
+                    newHtmlTag.classList.add(item);
+                }
+            }
+            return newHtmlTag;
+        }
+
+        displayAllUsers() {
+
+        }
+
+        removeExistingMessages() {
+            if (this.contactModalBody.children.length == 0) return;
+
+            let childement = this.contactModalBody.lastElementChild;
+
+            while (childement) {
+                this.contactModalBody.removeChild(childement)
+                childement = this.contactModalBody.lastElementChild;
+            }
+            return this.contactModalBody;
+        }
+    }
+</script>
+
+<!-- Messaging Hub Script -->
+<script>
+    class GroupNameModel {
+        constructor() {
+            this.groupName = null;
+        }
+
+        updateGroupNameModel(groupName) {
+            if (groupName) {
+                this.groupName = groupName;
+            }
+
+            // TODO: handle error here!
+            // Throw an exception
+
+            return this.groupName;
+        }
+
+        getGroupName() {
+            return this.groupName;
+        }
+    }
+
+    class MessagePayloadModel {
+        constructor() {
+            this.messagePayload = {
+                SenderId: null,
+                SenderUsername: null,
+                RecipientId: null,
+                RecipientUsername: null,
+                MessageContent: null
+            }
+        }
+
+        updatePayload(initialPayload) {
+            this.messagePayload.SenderId = initialPayload.senderId;
+            this.messagePayload.SenderUsername = initialPayload.senderUsername;
+            this.messagePayload.RecipientId = initialPayload.recipientId;
+            this.messagePayload.RecipientUsername = initialPayload.recipientUsername;
+        }
+
+        getUpdatedMessagePayload() {
+            return this.messagePayload;
+        }
+    }
+
+</script>
+
+<script>
+    class MessagingHubService {
+
+        constructor(groupNameModel, messagePayloadModel) {
+            this.connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .build();
+
+            this.sendButton = document.getElementById('send-message');
+            this.messageInput = document.getElementById('message-input');
+            this.apiService = new ApiService();
+            this.groupNameModel = groupNameModel;
+            this.messagePayloadModel = messagePayloadModel;
+
+            this.messageParentContainer = document.getElementById('message-thread-container');
+            this.recipientName = document.getElementById('recepient-name');
+        }
+
+        async startSendMessageHandler() {
+            this.sendButton.addEventListener('click', async () => {
+                let payload = this.messagePayloadModel.getUpdatedMessagePayload()
+                const groupName = this.groupNameModel.getGroupName();
+
+                if (this.messageInput.value == null || this.messageInput.value == "" || this.recipientName.textContent == "" || this.recipientName.textContent == null) {
+                    return;
+                }
+
+                payload.MessageContent = this.messageInput.value;
+
+                await this.connection.invoke("SendMessageToGroup", groupName, payload);
+                this.messageInput.value = "";
+
+            })
+            return this.sendButton;
+        }
+
+        async createHubConnection(groupName) {
+
+            await this.stopHubConnection();
+
+            this.connection.start().then(async () => {
+                await this.connection.invoke("JoinGroup", groupName)
+            });
+
+        }
+
+        async getIncomingMessages() {
+            this.connection.on("ReceiveMessage", async (message) => {
+                const createdMessageContainer = document.createElement('div');
+                const createdMessageText = document.createElement('p');
+
+                createdMessageText.classList = "message-content";
+
+                if (this.recipientName.textContent === message.recipientUsername) {
+                    createdMessageContainer.classList.add("message-content-container", "message-text-right");
+                    createdMessageText.textContent = message.messageContent;
+                    createdMessageContainer.appendChild(createdMessageText);
+
+                } else {
+                    createdMessageContainer.classList.add("message-content-container", "message-text-left");
+                    createdMessageText.textContent = message.messageContent;
+                    createdMessageContainer.appendChild(createdMessageText);
+                }
+
+                this.messageParentContainer.appendChild(createdMessageContainer)
+
+                this.messageParentContainer.scrollTop = this.messageParentContainer.scrollHeight;
+
+            });
+        }
+
+        async stopHubConnection() {
+            if (this.connection) {
+                await this.connection.stop();
+            }
+        }
+
+        async addGroup(groupName) {
+            this.stopHubConnection();
+            this.hubConnection().then(async () => {
+                await this.hubConnection().invoke("JoinGroup", groupName);
+            });
+        }
+
+        async hubConnection() {
+            return this.connection;
+        }
+
+        async sendMessageHandler(groupName, payload) {
+            try {
+                await this.hubConnection().invoke("SendMessageToGroup", groupName, payload);
+            } catch (error) {
+                window.alert(error);
+            }
+        }
+    }
+
+</script>
+
+<!-- ContactTemplate Script -->
+<script>
+    class ContactTemplate {
+    @* var avatar1 = "/images/avatar.png";
+        let avatar2 = ""; *@
+
+        constructor() {
+            this.contactParentContainer = document.getElementById('contact-list-container');
+            this._avatarImgPath = "/images/avatar-2.jpg";
+            this.recipientName = document.getElementById('recepient-name');
+            this.apiService = new ApiService();
+        }
+
+        createContactElement(username, contactId, contactImg = this._avatarImgPath) {
+            const createdContactContainer = document.createElement('div');
+            createdContactContainer.classList.add("contact-container", "border");
+            createdContactContainer.setAttribute('id', `contact-${contactId}`);
+
+            const avatar = this.createAvatarElement(this._avatarImgPath);
+            createdContactContainer.appendChild(avatar);
+
+            const createdContactInfoContainer = this.createContactInfoElement(username, contactId);
+            createdContactContainer.appendChild(createdContactInfoContainer);
+
+            this.contactParentContainer.appendChild(createdContactContainer);
+            this.changeRecipientNameHandler(createdContactContainer, username);
+
+            return createdContactContainer;
+        }
+
+        createAvatarElement(contactImg) {
+            const createdAvatarContainer = document.createElement('div');
+            const createdAvatarImgElement = document.createElement('img');
+            createdAvatarContainer.classList.add("contact-info-avatar-container");
+            createdAvatarImgElement.src = contactImg;
+            createdAvatarImgElement.classList.add('avatar-img');
+
+            createdAvatarContainer.appendChild(createdAvatarImgElement);
+
+            return createdAvatarContainer;
+        }
+
+        createContactInfoElement(contactUsername,
+            contactId,
+            recentMessage = "Recent Message Test!") {
+
+            const createdContactInfoContainer = document.createElement('div');
+
+            createdContactInfoContainer.classList.add("contact-info-container");
+
+            const createdContactUsernameElement = document.createElement('h5');
+    @* const createdContactRecentMessageElement = document.createElement('p');
+                createdContactRecentMessageElement.style.marginLeft = "10px"; *@
+
+    @* createdContactInfoContainer.style.flex = "1 0 auto"; *@
+
+                createdContactUsernameElement.textContent = contactUsername;
+    @* createdContactRecentMessageElement.textContent = recentMessage; *@
+
+                createdContactInfoContainer.appendChild(createdContactUsernameElement);
+    @* createdContactInfoContainer.appendChild(createdContactRecentMessageElement); *@
+
+            return createdContactInfoContainer;
+        }
+
+        async changeRecipientNameHandler(contactContainer, username) {
+            contactContainer.addEventListener('click', async () => {
+                this.recipientName.textContent = username;
+            })
+        }
+    }
+</script>
+
+<!-- MessagingTemplate Script -->
+<script>
+    class MessageTemplate {
+        constructor() {
+            this.messageParentContainer = document.getElementById('message-thread-container');
+            this.recipientName = document.getElementById('recepient-name');
+        }
+
+        createMessageTemplate(message) {
+            const createdMessageContainer = document.createElement('div');
+            const createdMessageContentElement = document.createElement('p');
+
+            createdMessageContentElement.textContent = message.messageContent;
+            createdMessageContentElement.classList.add("message-content");
+
+            if (message.recipientUsername === this.recipientName.textContent) {
+                createdMessageContainer.classList.add("message-content-container", "message-text-right");
+            } else {
+                createdMessageContainer.classList.add("message-content-container", "message-text-left")
+            }
+
+            createdMessageContainer.appendChild(createdMessageContentElement);
+            this.messageParentContainer.appendChild(createdMessageContainer);
+
+            this.messageParentContainer.scrollTop = this.messageParentContainer.scrollHeight;
+
+            return this.messageParentContainer;
+        }
+
+        getMessageParentContainer() {
+            return this.messageParentContainer;
+        }
+
+        removeExistingMessages() {
+            if (this.messageParentContainer.children.length == 0) return;
+
+            let childement = this.messageParentContainer.lastElementChild;
+
+            while (childement) {
+                this.messageParentContainer.removeChild(childement)
+                childement = this.messageParentContainer.lastElementChild;
+            }
+            return this.messageParentContainer;
+        }
+    }
+</script>
+
+<!-- ApiService Script -->
+<script>
+    class ApiService {
+        constructor() {
+            this.messagingUrl = "/messaging";
+            this.getMessageUrl = `${this.messagingUrl}/load-messages`;
+            this.getGroupNameUrl = `${this.messagingUrl}/get-groupname`;
+            this.contactUrl = "/contact";
+            this.getContactsUrl = `${this.contactUrl}/get-contacts`;
+            this.getUsersUrl = `${this.contactUrl}/get-users`;
+            this.initialMessagingPaloadUrl = `${this.messagingUrl}/initial-message-payload`;
+            this.addContactUrl = `${this.contactUrl}/add-contact`;
+            this.updateContactUrl = `${this.contactUrl}/update-contact`;
+            this.removeContactUrl = `${this.contactUrl}/remove-contact`;
+        }
+
+        async getGroupName(contactId) {
+            const groupName = await this.fetchApi(`${this.getGroupNameUrl}/${contactId}`);
+
+            if (groupName) {
+                return groupName;
+            } else {
+                window.alert("Cannot get Group Name");
+            }
+        }
+
+        async getUsers() {
+            const users = await this.fetchApi(this.getUsersUrl);
+            if (users) {
+                return users
+            } else {
+                window.alert("No Contact")
+            }
+        }
+
+        async getContacts() {
+            const contacts = await this.fetchApi(`${this.getContactsUrl}`);
+            if (contacts) {
+                return contacts;
+            } else {
+                window.alert("Get Contacts API Failed");
+            }
+
+        }
+
+        async addContact(payload) {
+            const addContactResponse = await this.postApi(`${this.addContactUrl}`, payload);
+
+            return addContactResponse;
+        }
+
+        async updateContact(payload) {
+            const updateContactResponse = await this.updateApi(`this`)
+        }
+
+        async removeContact(payload) {
+            const removeContactResponse = await this.removeContact(`${this.removeContactUrl}`, payload);
+
+            return removeContactResponse;
+        }
+
+        async getMessages(contactId) {
+            const messages = await this.fetchApi(`${this.getMessageUrl}/${contactId}`);
+            if (messages) {
+                return messages;
+            } else {
+                window.alert("Get Message Error")
+            }
+        }
+
+        // this payload will be used when
+        async getInitialPayload(contactId) {
+
+            const initialPayload = await this.fetchApi(`${this.initialMessagingPaloadUrl}/${contactId}`);
+
+            return initialPayload;
+        }
+
+        getPayloadModel() {
+            return {
+                SenderId: null,
+                SenderUsername: null,
+                RecipientId: null,
+                RecipientUsername: null,
+                MessageContent: null
+            }
+        }
+
+        async fetchApi(url) {
+            try {
+                const response = await fetch(url);
+                return await response.json();
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        async postApi(url, payload) {
+            try {
+                const response = await fetch(`${url}`, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                return await response.json();
+
+            } catch (error) {
+                window.alert("Post API Error!");
+            }
+        }
+
+        async updateApi(url, payload) {
+            try {
+                const response = await fetch(url, {
+                    method: "PUT",
+                    body: JSON.stringify(payload)
+                });
+
+                return await response.json();
+
+            } catch (error) {
+                window.alert(`Update API Error: ${error.toString()}`);
+            }
+        }
+
+        async deleteApi(url, payload) {
+            try {
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    body: JSON.stringify(payload)
+                });
+
+                return await response.json();
+
+            } catch (error) {
+                window.alert(`DELETE API error: ${error.toString()}`);
+            }
+        }
+
+    }
+</script>
+
+<script>
+    class ScreenDisplayService {
+        constructor() {
+            this.leftContainer = document.getElementById('left-container');
+            this.rightContainer = document.getElementById('right-container');
+            this.closeMessageContainer = document.getElementById('close-message');
+        }
+
+        runToggle(){
+
+            if (window.innerWidth < 700) {
+                jQuery.fx.off = true;
+               
+                $('#left-container').toggle('hide-element');
+                $('#right-container').toggle('hide-element');
+            }
+        }
+
+        hideContactContainer() {
+            if (window.innerWidth < 700) {
+                jQuery.fx.off = true;
+                $('#left-container').toggle('hide-element');
+                $('#right-container').toggle('hide-element');
+            }
+        }
+
+        hideMessageContainer() {
+            if (window.innerWidth < 700) {
+                $('#left-container').toggle('hide-element');
+                $('#right-container').toggle('hide-element');
+            }
+        }
+
+        runScreenSizeHandler(){
+            window.onresize = () => {
+                if(window.innerWidth > 700){
+                    let isLeftHidden = $("#left-container").hasClass("hide-element");
+                    
+                    if(isLeftHidden){
+                        $("#left-container").removeClass("hide-element");
+                    }
+
+                    let isRightHidden = $("#right-container").hasClass("hide-element");
+
+                    if(isRightHidden){
+                        $("#right-container").removeClass("hide-element");
+                    }
+
+                }
+            }
+        }
+    }
+</script>
+
+
+<script>
+    const mainApp = async () => {
+        const screenDisplay = new ScreenDisplayService();
+
+        const groupNameModel = new GroupNameModel();
+        const messagePayloadModel = new MessagePayloadModel();
+
+        const apiService = new ApiService();
+        const contactTemplate = new ContactTemplate();
+        const messageTemplate = new MessageTemplate();
+        const messageHubService = new MessagingHubService(groupNameModel, messagePayloadModel);
+
+        apiService.getContacts().then((resp) => {
+            resp.map(({contactUsername, contactId}) => {
+
+                let createdContactTemplate = contactTemplate.createContactElement(contactUsername, contactId)
+
+                messageTemplate.removeExistingMessages();
+
+                createdContactTemplate.addEventListener('click', () => {
+
+                    apiService.getMessages(contactId).then((messages) => {
+
+                        if(messages){
+                            messageTemplate.removeExistingMessages();
+                            messages.map((message) => messageTemplate.createMessageTemplate(message))
+                        }
+
+                    });
+
+                    apiService.getInitialPayload(contactId).then((initialPayLoadResponse) => {
+                        messagePayloadModel.updatePayload(initialPayLoadResponse);
+                    })
+
+                    apiService.getGroupName(contactId).then(({groupName}) => {
+                        groupNameModel.updateGroupNameModel(groupName);
+                        messageHubService.createHubConnection(groupName);
+                    })
+
+                    screenDisplay.hideContactContainer();
+                    
+
+                }); 
+            })
+        })
+        
+        screenDisplay.runScreenSizeHandler();
+
+        await messageHubService.startSendMessageHandler()
+        await messageHubService.getIncomingMessages()
+
+        const modalButton = document.getElementById('modal-button');
+        const contactModalTemplate = new ContactModalTemplate();
+
+        modalButton.addEventListener('click', () => {
+            contactModalTemplate.runContactModal();
+        });
+
+
+        closeMessageContainer = document.getElementById('close-message');
+        closeMessageContainer.addEventListener('click', () => {
+            $('#left-container').toggle('hide-element');
+            $('#right-container').toggle('hide-element');
+        })
+    }
+
+    mainApp();
+
+</script>

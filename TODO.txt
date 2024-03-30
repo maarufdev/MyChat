@@ -1,0 +1,16 @@
+TODO:
+
+Notifications:
+	1. Notification Count:
+		- Display all the unread notifications.
+		- When the modal is being clicked, the notifications must refreshed to 0 because viewing the content
+		  is meaning you've read the notifications.		
+
+	2. Modal
+		- Only display the pending request.
+		- If user accepted the request the notification item must be removed.
+		- If user rejected the notification item, this must be removed.
+
+
+SignalR Documentations:
+- https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-7.0

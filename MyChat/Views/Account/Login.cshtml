@@ -1,0 +1,29 @@
+@model MyChat.ViewModels.Account.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row justify-content-center align-items-center p-3 m-0">
+    <div class="col-md-6 shadow p-5">        
+        <form asp-action="Login">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="EmailAddress" class="form-control" placeholder="Enter Your Email" />
+                <label asp-for="EmailAddress" class="control-label"></label>
+                <span asp-validation-for="EmailAddress" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Password" class="form-control" placeholder="Enter Your Password" />
+                <label asp-for="Password" class="control-label"></label>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group my-3">
+                <input class="btn btn-success px-3 border-0 rounded-0" type="submit" value="Login" />
+                <a class="btn btn-dark px-3 border-0 rounded-0" asp-action="Register" asp-controller="Account">Register</a>
+            </div>
+        </form>
+    </div>
+</div>
+

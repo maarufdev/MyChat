@@ -1,0 +1,295 @@
+.messaging-container{
+	display: flex;
+}
+
+.text-white{
+    color: white;
+}
+
+#left-container{
+	flex: 0 2 400px;
+	display: flex;
+	flex-flow: nowrap column;
+	/* border: 2px solid black; */
+}
+
+#left-container header{
+	flex: 0 0 auto;
+}
+
+#left-container .message-list-container{
+	flex: 1 0 auto;
+}
+
+#right-container{
+	flex-basis: auto;
+	flex-grow: 2;
+	flex-shrink: 1;
+	height: 91.1vh;
+}
+
+/* Avatar */
+
+.contact-info-avatar-container{
+	width: 3rem;
+	height: 3rem;
+	border-radius: 50%;
+	overflow: hidden;
+}
+.contact-info-avatar-container .avatar-img{
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+
+
+.avatar {
+	width: 4rem;
+	height: 4rem;
+	border-radius: 50%;
+	/* border: 2px solid red; */
+	overflow: hidden;
+  }
+
+  .avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+  }
+
+
+  .contact-avatar{
+	width: 3rem;
+	height: 3rem;
+	border-radius: 25%;
+	overflow: hidden;
+}
+
+
+.contact-avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+  }
+  
+.user-details-container{
+	display: flex;
+}
+
+/* Hamburger Icon */
+.hamburger {
+	width: 30px;
+	height: 20px;
+	display: block;
+	justify-content: center;
+	cursor: pointer;
+  }
+  
+  .hamburger span {
+	width: 100%;
+	height: 3px;
+	/* background-color: black; */
+	display: block;
+	margin: 2px 0;
+  }
+  
+  .hamburger:hover span {
+	background-color: gray;
+  }
+
+  .left-container-header {
+	display: flex;
+	gap: 20px;
+	/* border: 2px solid green; */
+	padding: 5px;
+}
+  
+  /* search convo */
+  #search-convo{
+	flex: 1 0 auto;
+	gap: 20px;
+	border-radius: 20px;
+	background-color: #F2F2F2;
+	border: 0 solid white;
+	border-color: white;
+	padding: 10px 10px 10px 20px;
+  }
+  #search-convo::placeholder{
+	font-weight: bold;
+	font-style: italic;
+  }
+
+  #search-convo:focus{
+	border: 0;
+	border-color: #F2F2F2;
+  }
+
+.add-contact-icon{
+	flex: 0 0 auto;
+	font-size: 20px;
+}
+  
+.message-list-container{
+	padding: 5px;
+	display: flex;
+	gap: 10px;
+	flex-direction: column;
+	/* height: 80vh; */
+	/* margin: 0; */
+}
+.contact-info-container{
+	/* border: 2px solid red; */
+	display: flex;
+	flex-flow: nowrap column;
+	/* padding: 5px; */
+	/* gap: 5px; */
+	justify-content: center;
+	align-content: center;
+}
+
+.inbox-container{
+	display: flex;
+	margin: 5px;
+	padding: 5px;
+	/* border: 2px; */
+	/* border: 2px solid red; */
+}
+.contact-container{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 5px;
+	gap: 10px;
+	/* border: 2px solid red; */
+}
+
+
+.contact-message-details{
+	margin-left: 5px;
+	display: block;
+	/* border: 2px solid black; */
+}
+
+#message-header{
+	margin: 0px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px
+}
+.recipient-container{
+	flex-basis: auto;
+	flex-grow: 2;
+}
+
+#close-message{
+	visibility: hidden;
+	align-self: flex-end;
+}
+
+/* .message-header-avatar{
+	
+} */
+
+#message-thread-container{
+	width: 100%;
+	height: 75%;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+}
+
+.message-content-container{
+	/* max-width: 40rem; */
+	max-width: 80%;
+	
+	/* min-width: 10rem; */
+	/* border: 2px solid red; */
+	border-radius: 15px;
+	/* min-height: 40px; */
+	margin: 10px 30px;
+}
+.message-text-left{
+	/* color: white; */
+	align-self: flex-start;
+	background-color: #D9D9D9;
+}
+
+
+
+.message-text-right{
+	color: white;
+	align-self: end;
+	background-color: #3289DA;
+}
+
+.message-content{
+	margin: 5px 20px;
+	word-wrap: break-word;
+}
+
+.message-controller-container{
+	display: flex;
+	gap: 20px;
+	justify-content: space-between;
+	padding: 20px;
+}
+
+#message-input{
+	flex: 1 1 80%;
+	padding: 10px 20px 10px;
+	border-radius: 20px;
+	border: 0;
+	background-color: #F2F2F2;
+	
+}
+
+
+#send-message{
+	flex: 0 0 20%;
+	padding: 2px;
+	align-content: end;
+	margin-right: 25px;
+	/* background-color: #3289DA; */
+	color: white;
+	border-radius: 25px;
+}
+
+#message-input::placeholder{
+	font-weight: bold;
+	font-style: italic;
+}
+
+#message-input:focus{
+	outline: none;
+}
+
+
+/* Mobile layout! */
+
+@media screen and (max-width: 700px) {
+    .messaging-container{
+		display: flex;
+		flex-direction: column;
+	}
+	/* #left-container{
+		border: 2px soldi green;
+	} */
+	#right-container{
+		display: none;
+	}
+	.hide-container{
+		display: none m !important;
+	} 
+	#close-message{
+		visibility: visible;
+	}
+}
+
+@media screen and (min-width: 700px){
+	#right-container{
+		display: block;
+	}
+}

@@ -1,0 +1,139 @@
+<div class="messaging-page-container">
+    <div id="left-container">
+        <header class="left-container-header border">
+            <div class="search-input-container">
+                <img class="search-icon" src="/images/icons/icon-search.png" alt="">
+                <input id="search-contact-convo" type="text" autocomplete="off" placeholder="Search Contact..." />
+            </div>
+            <button class="btn-refresh-contact" id="refresh-contact-list">Refresh</button>
+        </header>
+        <div id="contact-list-container"></div>
+    </div>
+    <div class="border" id="right-container">
+        <div class="message-section__container">
+            <header class="message-section__header m-0 p-2 border" id="message-header">
+                <div class="message-recipient__container">
+                    <p class="message-recipient__name" id="recipient-name"></p>
+                </div>
+                <button 
+                    type="button" 
+                    class="message-header__button-close btn mb-1 hover-overlay bg" 
+                    aria-label="Close" 
+                    id="close-message"
+                    style="">X</button>
+
+            </header>
+            <div class="message-section__conversation" id="message-section__thread">
+            </div>
+            <div class="message-input__container border shadow rounded p-3">
+                <textarea class="message-input__text border rounded-0" id="message-input" placeholder="Type Message..."></textarea>
+                <button class="message-send__button" id="send-message">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal fade modal-dialog-scrollable" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Add Contact</h5>
+                <button id="close-modal" type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="search-contact-modal-container">
+                <div class="search-input-modal-container">
+                    <img class="icon-default-size" src="/images/icons/icon-search.png" alt="">
+                    <input class="" id="search-contact-modal" type="text" autocomplete="off"
+                        placeholder="Search contact to add">
+                </div>
+                <button type="button" class="refresh-modal-button" id="refresh-modal-list">Refresh</button>
+            </div>
+            <div class="modal-body border" id="contact-modal-body" style="height: 60vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Modal -->
+
+<div class="modal fade modal-dialog-scrollable"
+     id="notificationModal" 
+    data-bs-backdrop="static" 
+    data-bs-keyboard="false" 
+    tabindex="-1"
+    aria-labelledby="notificationModalLabel"
+    aria-hidden="true">
+    
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="notificationModalLabel">Connection Request</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="d-flex p-2 justify-content-between align-items-center">
+                            <p><span class="fw-bold">maarufb@gmail.com</span> request a friend request</p>
+                            <div class="px-2 d-flex gap-2">
+                                <button class="btn btn-success px-3 rounded-0">Accept</button>
+                                <button class="btn btn-danger px-3 rounded-0">Reject</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="d-flex p-2 justify-content-between align-items-center">
+                            <p><span class="fw-bold">maarufb@gmail.com</span> request a friend request</p>
+                            <div class="px-2 d-flex gap-2">
+                                <button class="btn btn-success px-3 rounded-0">Accept</button>
+                                <button class="btn btn-danger px-3 rounded-0">Reject</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="d-flex p-2 justify-content-between align-items-center">
+                            <p><span class="fw-bold">maarufb@gmail.com</span> request a friend request</p>
+                            <div class="px-2 d-flex gap-2">
+                                <button class="btn btn-success px-3 rounded-0">Accept</button>
+                                <button class="btn btn-danger px-3 rounded-0">Reject</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="d-flex p-2 justify-content-between align-items-center">
+                            <p><span class="fw-bold">maarufb@gmail.com</span> request a friend request</p>
+                            <div class="px-2 d-flex gap-2">
+                                <button class="btn btn-success px-3 rounded-0">Accept</button>
+                                <button class="btn btn-danger px-3 rounded-0">Reject</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark px-3 rounded-0" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    @*<script src="~/js/message/MessagingHubService.js" asp-append-version="true"></script>*@
+
+    <script src="~/js/site.js" type="module" asp-append-version="true"></script>
+}
